@@ -1,1 +1,308 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Môj denník - Pre duševné zdravie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8FAFC;
+            color: #1E293B;
+            transition: all 0.3s ease-in-out;
+        }
+        .mood-indicator {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+        }
+        .page-content {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .day-cell {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .day-cell:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center p-6 bg-gray-50 min-h-screen">
+    <div class="w-full max-w-4xl bg-white rounded-3xl shadow-2xl p-8 space-y-10">
 
+        <!-- Navigácia -->
+        <nav class="flex justify-center space-x-6 mb-8">
+            <button onclick="showPage('dennik')" class="nav-button text-lg font-medium text-gray-500 hover:text-blue-700 transition-colors">Denník</button>
+            <button onclick="showPage('motivacia')" class="nav-button text-lg font-medium text-gray-500 hover:text-blue-700 transition-colors">Motivácia</button>
+            <button onclick="showPage('o_aplikacii')" class="nav-button text-lg font-medium text-gray-500 hover:text-blue-700 transition-colors">O aplikácii</button>
+        </nav>
+
+        <!-- Obsah stránok -->
+        <div id="dennik" class="page-content">
+            <header class="text-center mb-10">
+                <h1 class="text-5xl font-extrabold text-blue-800 mb-3">Denník duševného zdravia</h1>
+                <p class="text-lg text-gray-600">Venujte chvíľku sebe. Sledujte svoju náladu a zapisujte si myšlienky.</p>
+            </header>
+            <section class="mb-10">
+                <div class="flex items-center justify-between mb-6">
+                    <button id="prevMonth" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-full transition-colors">&lt;</button>
+                    <h2 id="calendarTitle" class="text-3xl font-bold text-blue-700"></h2>
+                    <button id="nextMonth" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-full transition-colors">&gt;</button>
+                </div>
+                <div id="calendar" class="grid grid-cols-7 gap-4 text-center">
+                    <div class="text-sm font-semibold text-gray-500">Po</div>
+                    <div class="text-sm font-semibold text-gray-500">Ut</div>
+                    <div class="text-sm font-semibold text-gray-500">St</div>
+                    <div class="text-sm font-semibold text-gray-500">Št</div>
+                    <div class="text-sm font-semibold text-gray-500">Pi</div>
+                    <div class="text-sm font-semibold text-gray-500">So</div>
+                    <div class="text-sm font-semibold text-gray-500">Ne</div>
+                </div>
+            </section>
+
+            <section id="entrySection" class="bg-gray-100 p-8 rounded-2xl shadow-inner border border-gray-200">
+                <h3 id="entryHeader" class="text-2xl font-bold text-gray-800 mb-4">Vyberte deň pre záznam</h3>
+                <div id="entryContent" class="space-y-6 hidden">
+                    <div class="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
+                        <div class="w-full md:w-1/2">
+                            <label for="moodSlider" class="block text-gray-700 font-semibold mb-2">Ako sa cítite? (1-5)</label>
+                            <input type="range" id="moodSlider" min="1" max="5" value="3" class="w-full h-2 bg-gray-300 rounded-full appearance-none cursor-pointer">
+                            <div class="flex justify-between text-gray-500 text-sm mt-1">
+                                <span>1 (Hrozne)</span>
+                                <span>5 (Výborne)</span>
+                            </div>
+                        </div>
+                        <div class="w-full md:w-1/2">
+                            <label for="pocity" class="block text-gray-700 font-semibold mb-2">Čo dnes cítim?</label>
+                            <input type="text" id="pocity" placeholder="Napr. smútok, radosť, úzkosť" class="w-full p-2 rounded-lg border-2 border-gray-300 focus:border-blue-500">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="dennikEntry1" class="block text-gray-700 font-semibold mb-2">1. Čo sa dnes podarilo?</label>
+                        <textarea id="dennikEntry1" rows="3" class="w-full p-4 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors" placeholder="Napíšte svoj najväčší úspech dňa..."></textarea>
+                    </div>
+                    
+                    <div>
+                        <label for="dennikEntry2" class="block text-gray-700 font-semibold mb-2">2. Akým prekážkam som čelil/a?</label>
+                        <textarea id="dennikEntry2" rows="3" class="w-full p-4 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors" placeholder="Popíšte situácie, ktoré vás potrápili..."></textarea>
+                    </div>
+
+                    <div>
+                        <label for="dennikEntry3" class="block text-gray-700 font-semibold mb-2">3. Na čo myslím?</label>
+                        <textarea id="dennikEntry3" rows="3" class="w-full p-4 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors" placeholder="Zaznamenajte si myšlienky, ktoré sa vám opakovali..."></textarea>
+                    </div>
+
+                    <button id="saveButton" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-full w-full transition-transform hover:scale-105 shadow-lg">Uložiť záznam</button>
+                </div>
+                
+                <p id="saveMessage" class="text-center text-sm text-green-600 font-medium mt-4 hidden">Záznam bol úspešne uložený!</p>
+            </section>
+        </div>
+
+        <div id="motivacia" class="page-content hidden text-center">
+            <h1 class="text-4xl font-extrabold text-green-700 mb-6">Motivácia pre váš rast</h1>
+            <p class="text-lg text-gray-600 mb-8 max-w-xl mx-auto">Duševná pohoda je cesta, nie cieľ. Každý krok, malý či veľký, sa počíta. Pamätajte, že máte v sebe silu, o akej sa vám ani nesníva.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-indigo-100 p-6 rounded-xl shadow-md">
+                    <h3 class="text-xl font-bold text-indigo-800 mb-2">"Nečakajte, kým sa budete cítiť dobre, aby ste konali. Konajte, aby ste sa cítili dobre."</h3>
+                    <p class="text-sm text-indigo-700">- Neznámy autor</p>
+                </div>
+                <div class="bg-purple-100 p-6 rounded-xl shadow-md">
+                    <h3 class="text-xl font-bold text-purple-800 mb-2">"Vaša myseľ je ako záhrada. Čo v nej vypestujete, to zožnete."</h3>
+                    <p class="text-sm text-purple-700">- Neznámy autor</p>
+                </div>
+                <div class="bg-yellow-100 p-6 rounded-xl shadow-md">
+                    <h3 class="text-xl font-bold text-yellow-800 mb-2">"Pád nie je zlyhanie. Zlyhanie je ostať ležať tam, kam ste padli."</h3>
+                    <p class="text-sm text-yellow-700">- Sokrates</p>
+                </div>
+                <div class="bg-pink-100 p-6 rounded-xl shadow-md">
+                    <h3 class="text-xl font-bold text-pink-800 mb-2">"Svet je v našej hlave a my ho môžeme zmeniť."</h3>
+                    <p class="text-sm text-pink-700">- Neznámy autor</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="o_aplikacii" class="page-content hidden text-center">
+            <h1 class="text-4xl font-extrabold text-gray-700 mb-6">O aplikácii</h1>
+            <p class="text-lg text-gray-600 mb-4">Táto jednoduchá aplikácia je navrhnutá tak, aby vám pomohla sledovať vaše duševné zdravie a podporila vás v sebareflexii.</p>
+            <p class="text-md text-gray-500 mb-4">Veríme, že pravidelné zapisovanie do denníka vám pomôže lepšie porozumieť svojim emóciám a spoznať samého seba. Každý záznam, aj ten najmenší, je dôležitý pre váš rast. Používajte ju každý deň a uvidíte, ako sa váš život zmení.</p>
+            <div class="bg-blue-50 p-6 rounded-xl shadow-inner mt-8 max-w-lg mx-auto">
+                <h3 class="text-2xl font-semibold text-blue-700 mb-2">Ako začať?</h3>
+                <ol class="list-decimal list-inside text-left text-gray-600 space-y-2">
+                    <li>Prejdite na stránku "Denník" a kliknite na deň, ktorý chcete zaznamenať.</li>
+                    <li>Pomocou posuvníka označte, ako sa cítite.</li>
+                    <li>Odpovedzte na otázky a napíšte si poznámky.</li>
+                    <li>Uložte záznam a pokračujte s ďalším dňom.</li>
+                </ol>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const calendarEl = document.getElementById('calendar');
+        const calendarTitleEl = document.getElementById('calendarTitle');
+        const prevMonthBtn = document.getElementById('prevMonth');
+        const nextMonthBtn = document.getElementById('nextMonth');
+        const entryHeaderEl = document.getElementById('entryHeader');
+        const entryContentEl = document.getElementById('entryContent');
+        const moodSliderEl = document.getElementById('moodSlider');
+        const pocityEl = document.getElementById('pocity');
+        const dennikEntry1El = document.getElementById('dennikEntry1');
+        const dennikEntry2El = document.getElementById('dennikEntry2');
+        const dennikEntry3El = document.getElementById('dennikEntry3');
+        const saveButton = document.getElementById('saveButton');
+        const saveMessageEl = document.getElementById('saveMessage');
+
+        const pages = document.querySelectorAll('.page-content');
+
+        const moods = {
+            1: 'bg-red-500',
+            2: 'bg-yellow-500',
+            3: 'bg-gray-500',
+            4: 'bg-green-500',
+            5: 'bg-blue-500'
+        };
+
+        let currentYear = 2025;
+        let currentMonth = 8; // September je 8 (0-11)
+
+        function showPage(pageId) {
+            pages.forEach(page => {
+                page.classList.add('hidden');
+            });
+            document.getElementById(pageId).classList.remove('hidden');
+        }
+
+        function renderCalendar(year, month) {
+            calendarEl.innerHTML = `
+                <div class="text-sm font-semibold text-gray-500">Po</div>
+                <div class="text-sm font-semibold text-gray-500">Ut</div>
+                <div class="text-sm font-semibold text-gray-500">St</div>
+                <div class="text-sm font-semibold text-gray-500">Št</div>
+                <div class="text-sm font-semibold text-gray-500">Pi</div>
+                <div class="text-sm font-semibold text-gray-500">So</div>
+                <div class="text-sm font-semibold text-gray-500">Ne</div>
+            `;
+            const date = new Date(year, month, 1);
+            const firstDayIndex = (date.getDay() + 6) % 7;
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            calendarTitleEl.textContent = `${new Date(year, month).toLocaleString('sk-SK', { month: 'long', year: 'numeric' })}`;
+            
+            for (let i = 0; i < firstDayIndex; i++) {
+                const emptyCell = document.createElement('div');
+                calendarEl.appendChild(emptyCell);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const cell = document.createElement('div');
+                cell.className = 'day-cell bg-gray-50 p-3 rounded-lg flex flex-col justify-center items-center h-20 shadow-sm';
+                cell.textContent = day;
+                cell.dataset.date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                
+                const savedData = getSavedData(cell.dataset.date);
+                if (savedData && savedData.mood) {
+                    const moodCircle = document.createElement('div');
+                    moodCircle.className = `mood-indicator ${moods[savedData.mood]}`;
+                    cell.appendChild(moodCircle);
+                }
+
+                cell.addEventListener('click', () => {
+                    selectDay(cell.dataset.date);
+                });
+
+                calendarEl.appendChild(cell);
+            }
+        }
+
+        function getSavedData(date) {
+            try {
+                const data = localStorage.getItem(`journal-${date}`);
+                return data ? JSON.parse(data) : null;
+            } catch (e) {
+                console.error("Failed to retrieve data from localStorage.", e);
+                return null;
+            }
+        }
+
+        function selectDay(date) {
+            entryContentEl.classList.remove('hidden');
+            entryHeaderEl.textContent = `Záznam pre ${new Date(date).toLocaleDateString('sk-SK', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+            
+            const savedData = getSavedData(date);
+            if (savedData) {
+                moodSliderEl.value = savedData.mood;
+                pocityEl.value = savedData.pocity;
+                dennikEntry1El.value = savedData.text1;
+                dennikEntry2El.value = savedData.text2;
+                dennikEntry3El.value = savedData.text3;
+
+            } else {
+                moodSliderEl.value = 3;
+                pocityEl.value = '';
+                dennikEntry1El.value = '';
+                dennikEntry2El.value = '';
+                dennikEntry3El.value = '';
+            }
+
+            saveButton.onclick = () => {
+                const dataToSave = {
+                    mood: moodSliderEl.value,
+                    pocity: pocityEl.value,
+                    text1: dennikEntry1El.value,
+                    text2: dennikEntry2El.value,
+                    text3: dennikEntry3El.value
+                };
+                
+                try {
+                    localStorage.setItem(`journal-${date}`, JSON.stringify(dataToSave));
+                    saveMessageEl.textContent = 'Záznam bol úspešne uložený!';
+                    saveMessageEl.classList.remove('hidden');
+                    setTimeout(() => saveMessageEl.classList.add('hidden'), 3000);
+                    renderCalendar(currentYear, currentMonth);
+                } catch (e) {
+                    saveMessageEl.textContent = 'Chyba pri ukladaní záznamu.';
+                    saveMessageEl.classList.remove('hidden', 'text-green-600');
+                    saveMessageEl.classList.add('text-red-600');
+                }
+            };
+        }
+        
+        prevMonthBtn.addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar(currentYear, currentMonth);
+        });
+
+        nextMonthBtn.addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar(currentYear, currentMonth);
+        });
+
+        showPage('dennik');
+        renderCalendar(currentYear, currentMonth);
+    </script>
+</body>
+</html>
